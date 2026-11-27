@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Permiso para descargar las maratones de la API de RunDida -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- android:name=".CarrerasApp" registra la clase anotada con @HiltAndroidApp -->
     <application
         android:name=".CarrerasApp"
         android:allowBackup="true"
@@ -12,9 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CarrerasAtletismo">
 
+        <!-- adjustResize + imePadding(): el teclado no tapa los campos (también en horizontal) -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.CarrerasAtletismo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

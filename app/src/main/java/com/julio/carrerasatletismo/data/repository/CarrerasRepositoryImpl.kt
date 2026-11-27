@@ -40,6 +40,10 @@ import kotlin.math.roundToInt
  * INYECCIÓN DE DEPENDENCIAS: @Inject constructor le dice a Hilt cómo crear esta clase;
  * Hilt le pasa la base de datos, los 4 DAO y la API (vienen de di/ModuloDatos.kt).
  * @Singleton: una sola instancia compartida por toda la app.
+ *
+ * SOLID – L (Sustitución de Liskov): esta clase cumple TODO el contrato de CarrerasRepository,
+ * así que puede usarse en cualquier lugar donde se pida la interfaz (o cambiarse por una
+ * implementación falsa para pruebas) sin que los ViewModels noten la diferencia.
  */
 @Singleton
 class CarrerasRepositoryImpl @Inject constructor(

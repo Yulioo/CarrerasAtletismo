@@ -16,6 +16,9 @@ import kotlinx.coroutines.flow.Flow
  * DAO (Data Access Object) de la entidad CARRERA.
  * - Lecturas que observa la UI → devuelven Flow (patrón Observer: Room emite de nuevo al cambiar la tabla).
  * - Escrituras → suspend fun (se ejecutan en una corrutina, sin bloquear la pantalla).
+ *
+ * SOLID – I (Segregación de interfaces): en vez de un DAO gigante hay uno por entidad
+ * (CarreraDao, CorredorDao, CategoriaDao, InscripcionDao); cada quien usa solo lo que necesita.
  */
 @Dao
 interface CarreraDao {

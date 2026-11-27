@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -98,7 +99,7 @@ fun ContenidoCategorias(
         },
         snackbarHost = { SnackbarHost(snackbar) }
     ) { padding ->
-        val modificador = Modifier.padding(padding).consumeWindowInsets(padding)
+        val modificador = Modifier.padding(padding).consumeWindowInsets(padding).imePadding()
         when {
             uiState.cargando -> EstadoCargando(modificador)
             uiState.error != null -> EstadoError(uiState.error, onReintentar, modificador)

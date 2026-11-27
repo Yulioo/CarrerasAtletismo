@@ -171,6 +171,9 @@ fun DialogoConfirmarEliminar(
 }
 
 /**
+ * SOLID – O (Abierto/Cerrado): este componente se REUTILIZA en todos los formularios
+ * pasándole parámetros distintos, sin tener que modificar su código.
+ *
  * Campo de texto con manejo de error: isError pinta el campo de rojo y
  * supportingText muestra el mensaje personalizado debajo.
  */

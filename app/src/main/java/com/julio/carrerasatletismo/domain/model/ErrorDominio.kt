@@ -4,6 +4,9 @@ package com.julio.carrerasatletismo.domain.model
  * Excepciones PROPIAS de la app. El repositorio convierte los errores técnicos
  * (SQLiteConstraintException, IOException…) en estas excepciones con significado claro,
  * y el ViewModel las traduce a un mensaje personalizado de strings.xml.
+ *
+ * SOLID – O (Abierto/Cerrado): para un error nuevo se AGREGA otra subclase y su mensaje
+ * en aMensajeUi(), sin modificar las pantallas ni el código que ya funciona.
  */
 sealed class ErrorDominio(mensaje: String) : Exception(mensaje) {
     class NombreDuplicado(val nombre: String) : ErrorDominio("Ya existe un registro llamado $nombre")

@@ -2,8 +2,8 @@ package com.julio.carrerasatletismo.data.local
 
 import androidx.room.DatabaseView
 
-// Las vistas juntan las tablas normalizadas para que la interfaz
-// siga recibiendo la carrera con su ciudad/país y el corredor con su categoría.
+// Las vistas (@DatabaseView) juntan las tablas normalizadas para que la interfaz
+// reciba la carrera con su ciudad/país y el corredor con el nombre de su categoría.
 
 const val CARRERA_VISTA_SQL =
     "SELECT c.idCarrera AS idCarrera, c.nombre AS nombre, c.fecha AS fecha, " +
@@ -21,14 +21,13 @@ const val CORREDOR_VISTA_SQL =
         "INNER JOIN categoria ca ON ca.idCategoria = co.idCategoria"
 
 @DatabaseView(viewName = "carrera_vista", value = CARRERA_VISTA_SQL)
-data class Carrera(
+data class CarreraVista(
     val idCarrera: String,
     val nombre: String,
     val fecha: String,
     val ciudad: String,
     val pais: String,
     val url: String,
-
     val tipoRecorrido: String? = null,
     val desnivelM: Int? = null,
     val terreno: String? = null,
@@ -38,7 +37,7 @@ data class Carrera(
 )
 
 @DatabaseView(viewName = "corredor_vista", value = CORREDOR_VISTA_SQL)
-data class Corredor(
+data class CorredorVista(
     val idCorredor: Long,
     val nombre: String,
     val edad: Int,

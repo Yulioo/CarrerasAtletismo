@@ -1,12 +1,12 @@
-package com.julio.carrerasatletismo.domain.modelo
+package com.julio.carrerasatletismo.domain.model
 
-// Modelos de dominio: clases puras de Kotlin, sin anotaciones de Room.
-// La interfaz (UI) solo conoce estos modelos.
+// MODELOS DE DOMINIO: clases puras de Kotlin, sin anotaciones de Room ni de Retrofit.
+// La interfaz (UI) y los ViewModels solo conocen estos modelos.
 
 data class Carrera(
     val idCarrera: String,
     val nombre: String,
-    val fecha: String,
+    val fecha: String,      // formato aaaa-mm-dd
     val ciudad: String,
     val pais: String,
     val url: String,
@@ -16,7 +16,14 @@ data class Carrera(
     val temperaturaC: Double? = null,
     val humedad: Int? = null,
     val condiciones: String? = null
-)
+) {
+    /** Las carreras creadas en el celular empiezan con "local-"; las demás vienen de la API. */
+    val esLocal: Boolean get() = idCarrera.startsWith(PREFIJO_LOCAL)
+
+    companion object {
+        const val PREFIJO_LOCAL = "local-"
+    }
+}
 
 data class Corredor(
     val idCorredor: Long,
@@ -30,7 +37,8 @@ data class Categoria(
     val idCategoria: Long,
     val nombre: String,
     val edadMin: Int,
-    val edadMax: Int
+    val edadMax: Int,
+    val totalCorredores: Int = 0
 )
 
 data class CorredorConCarreras(

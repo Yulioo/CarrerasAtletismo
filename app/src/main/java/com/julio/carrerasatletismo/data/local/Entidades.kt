@@ -1,67 +1,72 @@
 package com.julio.carrerasatletismo.data.local
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /* ------------------------------------------------------------------
- * Modelo relacional (versión 2 de la base de datos)
+ * ENTIDADES DE ROOM (tablas de SQLite) – versión 2 de la base de datos
  *
- *  PAIS (idPais PK, nombre UNIQUE)
- *  CIUDAD (idCiudad PK, nombre, idPais FK -> PAIS)
- *  CATEGORIA (idCategoria PK, nombre UNIQUE, edadMin, edadMax)
- *  CARRERA (idCarrera PK, nombre, fecha, idCiudad FK -> CIUDAD, url, ...)
- *  CORREDOR (idCorredor PK, nombre, edad, idCategoria FK -> CATEGORIA)
- *  INSCRIPCION (idCorredor PK/FK, idCarrera PK/FK, dorsal, tiempoObjetivo)
- *      UNIQUE (idCarrera, dorsal)
- *  RESULTADO (idCorredor PK, idCarrera PK, tiempoReal)
- *      FK (idCorredor, idCarrera) -> INSCRIPCION
+ * Las 4 entidades principales con CRUD completo son:
+ *   1. CarreraEntity     (tabla carrera)
+ *   2. CorredorEntity    (tabla corredor)
+ *   3. CategoriaEntity   (tabla categoria)
+ *   4. InscripcionEntity (tabla inscripcion)  ← tabla intermedia N:M
+ *
+ * Relaciones:
+ *   - CATEGORIA 1 ── N CORREDOR            (relación 1:N)
+ *   - CORREDOR  N ── M CARRERA vía INSCRIPCION (relación N:M)
+ *
+ * Tablas de apoyo (normalización): PAIS, CIUDAD y RESULTADO.
  * ------------------------------------------------------------------ */
 
 @Entity(
     tableName = "pais",
-    indices = [Index(value = ["nombre"], unique = true)]
+    indices = [Index(value = ["nombre"], unique = true)] // no se repiten países
 )
-data class Pais(
-    @PrimaryKey(autoGenerate = true) val idPais: Long = 0,
-    val nombre: String
+data class PaisEntity(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "idPais") val idPais: Long = 0,
+    @ColumnInfo(name = "nombre") val nombre: String
 )
 
 @Entity(
     tableName = "ciudad",
     foreignKeys = [
         ForeignKey(
-            entity = Pais::class,
+            entity = PaisEntity::class,
             parentColumns = ["idPais"],
             childColumns = ["idPais"],
-            onDelete = ForeignKey.SET_NULL
+            onDelete = ForeignKey.SET_NULL // si se borra el país, la ciudad queda sin país
         )
     ],
     indices = [Index("idPais"), Index(value = ["nombre", "idPais"], unique = true)]
 )
-data class Ciudad(
-    @PrimaryKey(autoGenerate = true) val idCiudad: Long = 0,
-    val nombre: String,
-    val idPais: Long?
+data class CiudadEntity(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "idCiudad") val idCiudad: Long = 0,
+    @ColumnInfo(name = "nombre") val nombre: String,
+    @ColumnInfo(name = "idPais") val idPais: Long?
 )
 
+/** Entidad 3: CATEGORIA (Juvenil, Libre, Máster…). Lado "1" de la relación 1:N con corredor. */
 @Entity(
     tableName = "categoria",
-    indices = [Index(value = ["nombre"], unique = true)]
+    indices = [Index(value = ["nombre"], unique = true)] // UNIQUE: no puede haber dos categorías con el mismo nombre
 )
-data class Categoria(
-    @PrimaryKey(autoGenerate = true) val idCategoria: Long = 0,
-    val nombre: String,
-    val edadMin: Int,
-    val edadMax: Int
+data class CategoriaEntity(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "idCategoria") val idCategoria: Long = 0,
+    @ColumnInfo(name = "nombre") val nombre: String,
+    @ColumnInfo(name = "edadMin") val edadMin: Int,
+    @ColumnInfo(name = "edadMax") val edadMax: Int
 )
 
+/** Entidad 1: CARRERA (maratón). */
 @Entity(
     tableName = "carrera",
     foreignKeys = [
         ForeignKey(
-            entity = Ciudad::class,
+            entity = CiudadEntity::class,
             parentColumns = ["idCiudad"],
             childColumns = ["idCiudad"],
             onDelete = ForeignKey.SET_NULL
@@ -70,39 +75,43 @@ data class Categoria(
     indices = [Index("idCiudad")]
 )
 data class CarreraEntity(
-    @PrimaryKey val idCarrera: String,
-    val nombre: String,
-    val fecha: String,
-    val idCiudad: Long?,
-    val url: String,
+    @PrimaryKey @ColumnInfo(name = "idCarrera") val idCarrera: String,
+    @ColumnInfo(name = "nombre") val nombre: String,
+    @ColumnInfo(name = "fecha") val fecha: String,
+    @ColumnInfo(name = "idCiudad") val idCiudad: Long?,
+    @ColumnInfo(name = "url") val url: String,
 
-    val tipoRecorrido: String? = null,
-    val desnivelM: Int? = null,
-    val terreno: String? = null,
-    val temperaturaC: Double? = null,
-    val humedad: Int? = null,
-    val condiciones: String? = null
+    @ColumnInfo(name = "tipoRecorrido") val tipoRecorrido: String? = null,
+    @ColumnInfo(name = "desnivelM") val desnivelM: Int? = null,
+    @ColumnInfo(name = "terreno") val terreno: String? = null,
+    @ColumnInfo(name = "temperaturaC") val temperaturaC: Double? = null,
+    @ColumnInfo(name = "humedad") val humedad: Int? = null,
+    @ColumnInfo(name = "condiciones") val condiciones: String? = null
 )
 
+/** Entidad 2: CORREDOR. Lado "N" de la relación 1:N con categoría. */
 @Entity(
     tableName = "corredor",
     foreignKeys = [
         ForeignKey(
-            entity = Categoria::class,
+            entity = CategoriaEntity::class,
             parentColumns = ["idCategoria"],
             childColumns = ["idCategoria"],
+            // RESTRICT: no se deja borrar una categoría que todavía tiene corredores.
+            // El repositorio atrapa el error y muestra un mensaje claro.
             onDelete = ForeignKey.RESTRICT
         )
     ],
     indices = [Index("idCategoria")]
 )
 data class CorredorEntity(
-    @PrimaryKey(autoGenerate = true) val idCorredor: Long = 0,
-    val nombre: String,
-    val edad: Int,
-    val idCategoria: Long
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "idCorredor") val idCorredor: Long = 0,
+    @ColumnInfo(name = "nombre") val nombre: String,
+    @ColumnInfo(name = "edad") val edad: Int,
+    @ColumnInfo(name = "idCategoria") val idCategoria: Long
 )
 
+/** Entidad 4: INSCRIPCION – tabla intermedia de la relación N:M corredor ↔ carrera. */
 @Entity(
     tableName = "inscripcion",
     primaryKeys = ["idCorredor", "idCarrera"],
@@ -111,42 +120,43 @@ data class CorredorEntity(
             entity = CorredorEntity::class,
             parentColumns = ["idCorredor"],
             childColumns = ["idCorredor"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE // si se borra el corredor, se borran sus inscripciones
         ),
         ForeignKey(
             entity = CarreraEntity::class,
             parentColumns = ["idCarrera"],
             childColumns = ["idCarrera"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE // si se borra la carrera, se borran sus inscripciones
         )
     ],
     indices = [
         Index("idCarrera"),
-        // Dos corredores no pueden llevar el mismo dorsal en la misma carrera
+        // UNIQUE: dos corredores no pueden llevar el mismo dorsal en la misma carrera
         Index(value = ["idCarrera", "dorsal"], unique = true)
     ]
 )
-data class Inscripcion(
-    val idCorredor: Long,
-    val idCarrera: String,
-    val dorsal: Int,
-    val tiempoObjetivo: String
+data class InscripcionEntity(
+    @ColumnInfo(name = "idCorredor") val idCorredor: Long,
+    @ColumnInfo(name = "idCarrera") val idCarrera: String,
+    @ColumnInfo(name = "dorsal") val dorsal: Int,
+    @ColumnInfo(name = "tiempoObjetivo") val tiempoObjetivo: String
 )
 
+/** Tiempo final de un corredor inscrito. Depende de la inscripción (CASCADE). */
 @Entity(
     tableName = "resultado",
     primaryKeys = ["idCorredor", "idCarrera"],
     foreignKeys = [
         ForeignKey(
-            entity = Inscripcion::class,
+            entity = InscripcionEntity::class,
             parentColumns = ["idCorredor", "idCarrera"],
             childColumns = ["idCorredor", "idCarrera"],
             onDelete = ForeignKey.CASCADE
         )
     ]
 )
-data class Resultado(
-    val idCorredor: Long,
-    val idCarrera: String,
-    val tiempoReal: String
+data class ResultadoEntity(
+    @ColumnInfo(name = "idCorredor") val idCorredor: Long,
+    @ColumnInfo(name = "idCarrera") val idCarrera: String,
+    @ColumnInfo(name = "tiempoReal") val tiempoReal: String
 )

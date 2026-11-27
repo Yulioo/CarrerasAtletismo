@@ -1,18 +1,25 @@
 package com.julio.carrerasatletismo.data.mapper
 
-import com.julio.carrerasatletismo.data.local.Categoria as CategoriaEntity
-import com.julio.carrerasatletismo.data.local.Carrera as CarreraVista
-import com.julio.carrerasatletismo.data.local.Corredor as CorredorVista
+import com.julio.carrerasatletismo.data.local.CarreraEntity
+import com.julio.carrerasatletismo.data.local.CarreraVista
+import com.julio.carrerasatletismo.data.local.CategoriaConCorredores
+import com.julio.carrerasatletismo.data.local.CategoriaEntity
+import com.julio.carrerasatletismo.data.local.CorredorVista
 import com.julio.carrerasatletismo.data.local.CorredorConCarreras as CorredorConCarrerasLocal
 import com.julio.carrerasatletismo.data.local.InscritoEnCarrera as InscritoLocal
-import com.julio.carrerasatletismo.domain.modelo.Carrera
-import com.julio.carrerasatletismo.domain.modelo.Categoria
-import com.julio.carrerasatletismo.domain.modelo.Corredor
-import com.julio.carrerasatletismo.domain.modelo.CorredorConCarreras
-import com.julio.carrerasatletismo.domain.modelo.InscritoEnCarrera
+import com.julio.carrerasatletismo.domain.model.Carrera
+import com.julio.carrerasatletismo.domain.model.Categoria
+import com.julio.carrerasatletismo.domain.model.Corredor
+import com.julio.carrerasatletismo.domain.model.CorredorConCarreras
+import com.julio.carrerasatletismo.domain.model.InscritoEnCarrera
 
-// Mappers: convierten los objetos de Room (capa data) a modelos de dominio.
+/*
+ * MAPPERS = FUNCIONES DE EXTENSIÓN.
+ * "fun CarreraVista.toDomain()" agrega un método nuevo a la clase CarreraVista sin modificarla.
+ * Convierten objetos de Room (capa data) ↔ modelos de dominio (capa domain).
+ */
 
+// ---------- Entity / Vista → Dominio ----------
 fun CarreraVista.toDomain() = Carrera(
     idCarrera = idCarrera,
     nombre = nombre,
@@ -36,12 +43,15 @@ fun CorredorVista.toDomain() = Corredor(
     idCategoria = idCategoria
 )
 
-fun CategoriaEntity.toDomain() = Categoria(
+fun CategoriaEntity.toDomain(totalCorredores: Int = 0) = Categoria(
     idCategoria = idCategoria,
     nombre = nombre,
     edadMin = edadMin,
-    edadMax = edadMax
+    edadMax = edadMax,
+    totalCorredores = totalCorredores
 )
+
+fun CategoriaConCorredores.toDomain() = categoria.toDomain(totalCorredores = corredores.size)
 
 fun CorredorConCarrerasLocal.toDomain() = CorredorConCarreras(
     corredor = corredor.toDomain(),
@@ -56,4 +66,26 @@ fun InscritoLocal.toDomain() = InscritoEnCarrera(
     tiempoObjetivo = tiempoObjetivo,
     tiempoReal = tiempoReal,
     posicion = posicion
+)
+
+// ---------- Dominio → Entity ----------
+fun Carrera.toEntity(idCiudad: Long?) = CarreraEntity(
+    idCarrera = idCarrera,
+    nombre = nombre,
+    fecha = fecha,
+    idCiudad = idCiudad,
+    url = url,
+    tipoRecorrido = tipoRecorrido,
+    desnivelM = desnivelM,
+    terreno = terreno,
+    temperaturaC = temperaturaC,
+    humedad = humedad,
+    condiciones = condiciones
+)
+
+fun Categoria.toEntity() = CategoriaEntity(
+    idCategoria = idCategoria,
+    nombre = nombre,
+    edadMin = edadMin,
+    edadMax = edadMax
 )

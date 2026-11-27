@@ -3,12 +3,7 @@ package com.julio.carrerasatletismo.data.local
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-fun sembrarCategorias(db: SupportSQLiteDatabase) {
-    db.execSQL(
-        """INSERT OR IGNORE INTO categoria (nombre, edadMin, edadMax) VALUES
-           ('Juvenil', 0, 17), ('Libre', 18, 39), ('Máster', 40, 999)"""
-    )
-}
+// sembrarCategorias() está en DatosIniciales.kt
 
 /**
  * Versión 1 -> 2:

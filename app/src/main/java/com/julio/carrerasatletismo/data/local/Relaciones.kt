@@ -4,26 +4,35 @@ import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
 
+/**
+ * Relación N:M (muchos a muchos): un corredor con todas las carreras en las que está inscrito.
+ * @Embedded pone las columnas del corredor; @Relation + Junction usa la tabla intermedia
+ * INSCRIPCION para buscar las carreras.
+ */
 data class CorredorConCarreras(
-    @Embedded val corredor: Corredor,
+    @Embedded val corredor: CorredorVista,
     @Relation(
         parentColumn = "idCorredor",
         entityColumn = "idCarrera",
-        associateBy = Junction(Inscripcion::class)
+        associateBy = Junction(InscripcionEntity::class)
     )
-    val carreras: List<Carrera>
+    val carreras: List<CarreraVista>
 )
 
-data class CarreraConCorredores(
-    @Embedded val carrera: Carrera,
+/**
+ * Relación 1:N (uno a muchos): una categoría con todos sus corredores.
+ * La columna idCategoria de CORREDOR apunta a la categoría.
+ */
+data class CategoriaConCorredores(
+    @Embedded val categoria: CategoriaEntity,
     @Relation(
-        parentColumn = "idCarrera",
-        entityColumn = "idCorredor",
-        associateBy = Junction(Inscripcion::class)
+        parentColumn = "idCategoria",
+        entityColumn = "idCategoria"
     )
-    val corredores: List<Corredor>
+    val corredores: List<CorredorEntity>
 )
 
+/** Resultado de la consulta de inscritos de una carrera (JOIN de varias tablas). */
 data class InscritoEnCarrera(
     val idCorredor: Long,
     val nombre: String,

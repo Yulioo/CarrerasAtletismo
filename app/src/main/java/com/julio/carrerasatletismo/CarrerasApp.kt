@@ -1,18 +1,12 @@
 package com.julio.carrerasatletismo
 
 import android.app.Application
-import com.julio.carrerasatletismo.di.ContenedorApp
-import com.julio.carrerasatletismo.di.ContenedorAppImpl
+import dagger.hilt.android.HiltAndroidApp
 
-// Clase Application: crea el contenedor de dependencias al iniciar la app.
-// Se registra en AndroidManifest.xml con android:name=".CarrerasApp"
-class CarrerasApp : Application() {
-
-    lateinit var contenedor: ContenedorApp
-        private set
-
-    override fun onCreate() {
-        super.onCreate()
-        contenedor = ContenedorAppImpl(this)
-    }
-}
+/**
+ * Clase Application: es lo PRIMERO que Android crea al abrir la app.
+ * @HiltAndroidApp genera el contenedor de dependencias de Hilt para toda la aplicación.
+ * Se registra en AndroidManifest.xml con android:name=".CarrerasApp".
+ */
+@HiltAndroidApp
+class CarrerasApp : Application()
